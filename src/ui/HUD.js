@@ -26,7 +26,7 @@ export class HUD {
 
     root.innerHTML = `
       <div class="hud__panel hud__title">
-        Elemental Sandbox
+        Elemental Arena
         <span data-blurb>Press Q, E, R, F, V or X, aim, click to cast.</span>
       </div>
 
@@ -41,10 +41,10 @@ export class HUD {
         <div><strong>Q</strong> — Frost Lance &nbsp; <strong>E</strong> — Storm Lance</div>
         <div><strong>R</strong> — Cinder Fall &nbsp; <strong>F</strong> — Nova Beam</div>
         <div><strong>V</strong> — Voltaic Snare &nbsp; <strong>X</strong> — Glacial Crown</div>
-        <div class="hud__help-note">V and X are far casts — aimed with a circle, not an arrow.</div>
-        <div><strong>Move</strong> — aim &nbsp; <strong>Left click</strong> — cast</div>
+        <div class="hud__help-note">R, V and X are far casts — aimed with a circle, not an arrow.</div>
+        <div><strong>WASD</strong> — move &nbsp; <strong>Mouse</strong> — aim &nbsp; <strong>Left click</strong> — cast</div>
         <div><strong>Esc / right click</strong> — cancel the cast</div>
-        <div><strong>Right drag</strong> — orbit &nbsp; <strong>Scroll</strong> — zoom</div>
+        <div><strong>Scroll</strong> — zoom</div>
         <div style="margin-top:6px">
           <kbd>G</kbd> editor &nbsp; <kbd>P</kbd> pause &nbsp; <kbd>C</kbd> clear
         </div>
@@ -58,7 +58,7 @@ export class HUD {
           return `
             <div class="ability-card" data-element="${element}" style="--accent:${meta.accent}">
               <div class="ability-card__sweep" data-sweep></div>
-              <div class="ability-card__key">${meta.key}</div>
+              <div class="ability-card__countdown"></div><div class="ability-card__key">${meta.key}</div>
               <div class="ability-card__glyph">${ELEMENT_SIGILS[element] ?? ''}</div>
               <div class="ability-card__label">${meta.label}</div>
             </div>`;
@@ -127,6 +127,7 @@ export class HUD {
     const card = this.cards.get(element);
     if (!card) return;
 
+    card.querySelector('.ability-card__countdown').textContent = remaining > 0 ? remaining.toFixed(1) : '';
     const ratio = Math.max(0, Math.min(1, remaining / Math.max(total, 0.001)));
     // Only touch the DOM when the sweep visibly moves.
     if (Math.abs(ratio - (this._cooldownShown.get(element) ?? -1)) < 0.01) return;

@@ -32,6 +32,7 @@ export class CameraRig {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.075;
     this.controls.enablePan = false;
+    this.controls.enableRotate = false;
     this.controls.enableZoom = false; // the wheel drives `settings.camera.distance` instead
     this.controls.minPolarAngle = settings.camera.minPolar;
     this.controls.maxPolarAngle = settings.camera.maxPolar;
@@ -102,11 +103,14 @@ export class CameraRig {
     _desiredTarget.y += cam.targetHeight;
     _desiredTarget.lerp(this.focus, blend);
 
+    const previousTarget = this.controls.target.clone();
     this.controls.target.set(
       damp(this.controls.target.x, _desiredTarget.x, cam.damping, dt),
       damp(this.controls.target.y, _desiredTarget.y, cam.damping, dt),
       damp(this.controls.target.z, _desiredTarget.z, cam.damping, dt)
     );
+
+    this.camera.position.add(_dir.copy(this.controls.target).sub(previousTarget));
 
     this.focusWeight = damp(this.focusWeight, 0, 0.08, dt);
 

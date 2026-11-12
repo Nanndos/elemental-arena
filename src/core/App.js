@@ -1,4 +1,5 @@
-import { Vector3, MathUtils } from 'three';
+import { Arena } from '../game/Arena.js';
+import { Vector3 } from 'three';
 
 import { Renderer } from './Renderer.js';
 import { Time } from './Time.js';
@@ -121,6 +122,8 @@ export class App {
       onToast: (message) => this.hud.showToast(message)
     });
 
+    this.editor.toggle();
+    this.game = new Arena(this);
     this._bindEvents();
     this.selectAbility(ELEMENTS[0], { silent: true });
 
@@ -144,7 +147,8 @@ export class App {
     this.input.on('pointer:move', (pointer) => this.aim.point(pointer));
     this.input.on('pointer:confirm', (pointer) => {
       this.aim.point(pointer);
-      this.aim.confirm();
+      this.aim.update(0);
+      if (this.game.state.phase === 'playing' && !this.paused) this.aim.confirm();
     });
     this.input.on('action', (action, slot) => this._handleAction(action, slot));
 
@@ -157,6 +161,7 @@ export class App {
   _handleAction(action, slot) {
     switch (action) {
       case 'ability': {
+        if (this.game.state.phase !== 'playing') return;
         const element = ELEMENTS[slot] ?? this.element;
         // Pressing the *same* key again puts an armed cast away, as it does in a
         // MOBA; pressing a different one swaps the slot without disarming.
@@ -200,6 +205,7 @@ export class App {
 
   /** Select an ability and arm it, unless it is still cooling down. */
   armAbility(element = this.element) {
+    if (this.game.state.phase !== 'playing' || this.paused) return;
     if ((this.cooldowns.get(element) ?? 0) > 0) {
       this.hud.showToast('Not ready');
       return;
@@ -212,7 +218,8 @@ export class App {
 
   _cast(origin, direction, distance) {
     const element = this.element;
-    this.abilities.cast(origin, direction, distance, element);
+    if (this.game.state.phase !== 'playing' || this.paused || this.cooldowns.get(element) > 0) return;
+    this.game.register(this.abilities.cast(origin, direction, distance, element));
     this.cooldowns.set(element, Math.max(0, settings[element].cooldown));
 
     // Snap onto the shot and throw the body into it. Which clip that is belongs
@@ -387,7 +394,7 @@ export class App {
     gl.info.reset();
 
     const raw = this.time.tick();
-    const dt = this.paused ? 0 : raw * settings.global.timeScale;
+    const dt = (this.paused || this.game.state.phase !== 'playing') ? 0 : raw * settings.global.timeScale;
     this.elapsed += dt;
 
     /* ---- shared uniforms ---- */
@@ -406,6 +413,7 @@ export class App {
 
     // Targeting runs on *real* time so the arrow keeps sweeping and animating
     // while the sandbox is paused — pausing freezes the effects, not the UI.
+    this.game.update(dt);
     this.aim.setOrigin(this.character.position);
     this.aim.update(raw);
 
@@ -415,7 +423,7 @@ export class App {
     this.character.update(dt);
 
     for (const [element, remaining] of this.cooldowns) {
-      if (remaining > 0) this.cooldowns.set(element, Math.max(0, remaining - raw));
+      if (remaining > 0) this.cooldowns.set(element, Math.max(0, remaining - dt));
     }
 
     this.ground.update(this.elapsed);
@@ -429,8 +437,6 @@ export class App {
     this.lights.update(dt);
 
     /* ---- camera ---- */
-    const focus = this.abilities.focus;
-    if (focus) this.rig.lookAt(focus.position, MathUtils.clamp(1 - focus.u * 0.4, 0, 1));
     this.rig.setAnchor(this.character.position.x, 0, this.character.position.z);
     this.shake.update(raw);
     this.flash.update(raw);
@@ -462,6 +468,7 @@ export class App {
 
   dispose() {
     this.stop();
+    this.game.dispose();
     this.input.dispose();
     this.aim.dispose();
     this.abilities.dispose();

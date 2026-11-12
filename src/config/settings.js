@@ -1838,7 +1838,7 @@ export const ELEMENTS = ['ice', 'thunder', 'meteor', 'beam', 'snare', 'glacier']
 export const ELEMENT_META = {
   ice: { label: 'Frost Lance', accent: '#5fd0ff', key: 'Q', hint: 'Frost Lance' },
   thunder: { label: 'Storm Lance', accent: '#7fb4ff', key: 'E', hint: 'Storm Lance' },
-  meteor: { label: 'Cinder Fall', accent: '#ff8a3c', key: 'R', hint: 'Cinder Fall' },
+  meteor: { label: 'Cinder Fall', accent: '#ff8a3c', key: 'R', hint: 'Cinder Fall', cast: CastShape.ZONE },
   beam: { label: 'Nova Beam', accent: '#7ff0ff', key: 'F', hint: 'Nova Beam' },
   snare: {
     label: 'Voltaic Snare',

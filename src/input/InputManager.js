@@ -30,6 +30,7 @@ export class InputManager extends EventEmitter {
     window.addEventListener('pointermove', this._onPointerMove);
     window.addEventListener('keydown', this._onKeyDown);
     window.addEventListener('keyup', this._onKeyUp);
+    window.addEventListener('blur', this._onBlur);
     this.dom.addEventListener('contextmenu', this._onContextMenu);
   }
 
@@ -115,6 +116,8 @@ export class InputManager extends EventEmitter {
     }
   };
 
+  _onBlur = () => this.keys.clear();
+
   _onKeyUp = (event) => {
     this.keys.delete(event.code);
   };
@@ -124,6 +127,7 @@ export class InputManager extends EventEmitter {
     window.removeEventListener('pointermove', this._onPointerMove);
     window.removeEventListener('keydown', this._onKeyDown);
     window.removeEventListener('keyup', this._onKeyUp);
+    window.removeEventListener('blur', this._onBlur);
     this.dom.removeEventListener('contextmenu', this._onContextMenu);
     this.clear();
   }

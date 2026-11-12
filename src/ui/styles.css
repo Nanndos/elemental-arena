@@ -952,3 +952,16 @@ body {
   }
 }
 
+
+/* Arena game layer; original sandbox/editor UI remains available with G. */
+.contact, .hud__stats, .hud__title { display: none !important; }
+.arena-readout { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); color: #e4f3ff; background: #101421df; border: 1px solid #7ecfff44; padding: 15px 24px; border-radius: 12px; font: 600 15px/1.4 system-ui; letter-spacing: 2px; white-space: nowrap; pointer-events: none; }
+.arena-screen { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: radial-gradient(ellipse at center, #112138c9, #070912ed); text-align: center; color: #d4eaff; font: 16px/1.8 system-ui; }
+.arena-screen[hidden] { display: none; }
+.arena-screen h1 { font-size: clamp(40px, 7vw, 84px); line-height: 1.1; letter-spacing: -3px; margin: 20px 0; color: #f1faff; text-shadow: 0 0 45px #68bdff66; }
+.arena-eyebrow { letter-spacing: 5px; font-size: 12px; color: #7ecfff; }
+.arena-screen button { display: block; margin: 28px auto 10px; border: 1px solid #89d7ff; border-radius: 8px; padding: 14px 35px; background: #26445c; color: white; font: 600 17px system-ui; cursor: pointer; }
+.arena-screen small { color: #93abc1; }
+.ability-card__countdown { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; font: 700 24px system-ui; color: white; text-shadow: 0 2px 6px black; pointer-events: none; }
+.ability-card.is-cooling .ability-card__glyph { opacity: 0.25; }
+@media (max-width: 700px) { .arena-readout { font-size: 11px; padding: 10px; letter-spacing: 1px; } .hud__help { display: none; } }
